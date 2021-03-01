@@ -67,6 +67,7 @@ class CollectionReference extends Reference {
   QueryReference where(
     String fieldPath, {
     dynamic isEqualTo,
+    dynamic isNotEqualTo,
     dynamic isLessThan,
     dynamic isLessThanOrEqualTo,
     dynamic isGreaterThan,
@@ -78,6 +79,7 @@ class CollectionReference extends Reference {
   }) {
     return QueryReference(gateway, path).where(fieldPath,
         isEqualTo: isEqualTo,
+        isNotEqualTo: isNotEqualTo,
         isLessThan: isLessThan,
         isLessThanOrEqualTo: isLessThanOrEqualTo,
         isGreaterThan: isGreaterThan,
@@ -258,6 +260,7 @@ class QueryReference extends Reference {
   QueryReference where(
     String fieldPath, {
     dynamic isEqualTo,
+    dynamic isNotEqualTo,
     dynamic isLessThan,
     dynamic isLessThanOrEqualTo,
     dynamic isGreaterThan,
@@ -270,6 +273,10 @@ class QueryReference extends Reference {
     if (isEqualTo != null) {
       _addFilter(fieldPath, isEqualTo,
           operator: StructuredQuery_FieldFilter_Operator.EQUAL);
+    }
+    if (isNotEqualTo != null) {
+      _addFilter(fieldPath, isNotEqualTo,
+          operator: StructuredQuery_FieldFilter_Operator.NOT_EQUAL);
     }
     if (isLessThan != null) {
       _addFilter(fieldPath, isLessThan,
