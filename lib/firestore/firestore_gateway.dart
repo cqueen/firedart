@@ -202,8 +202,24 @@ class FirestoreGateway {
 
   void _setupClient() {
     _listenRequestStreamMap.clear();
+    CallOptions callOptions;
+
+    // See if auth is not set, and if it is not, try to grab the GOOGLE_APPLICATION_CREDENTIALS 
+    // so we can instead utilize a service account.
+    if (auth != null) {
+      callOptions = TokenAuthenticator.from(auth)?.toCallOptions;
+    } else {
+      var credsEnv = Platform.environment['GOOGLE_APPLICATION_CREDENTIALS'];
+      if (credsEnv != null && credsEnv.isNotEmpty) {
+        // If env var is specific and not empty, we always try to load, even if
+        // the file doesn't exist.
+        final serviceAccountJson = File(credsEnv).readAsStringSync();
+        final credentials = JwtServiceAccountAuthenticator(serviceAccountJson);
+        callOptions = credentials.toCallOptions;
+      }
+    }
     _client = FirestoreClient(ClientChannel('firestore.googleapis.com'),
-        options: TokenAuthenticator.from(auth)?.toCallOptions);
+        options: callOptions);
   }
 
   void _handleError(e) {
